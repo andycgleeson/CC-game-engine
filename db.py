@@ -31,6 +31,12 @@ def delete_item_by_id(table, id_name, item_id, params):
         connection.commit()
         return cursor.lastrowid
 
+# settings
+
+def get_default_user_id():
+    sql = f"SELECT value FROM settings WHERE parameter = 'default_user'"
+    return get_row(sql, [])[0]
+
 # Persons
 
 def get_persons():
@@ -66,8 +72,8 @@ def get_portal_by_id(portal_id):
     row = get_row(sql, [])
     return Portal(*row)
 
-def get_portals_for_location(location):
-    sql = f"SELECT * FROM portals WHERE source = '{location}'"
+def get_portals_for_location(location_id):
+    sql = f"SELECT * FROM portals WHERE source = '{location_id}'"
     rows = get_list(sql, [])
     return [Portal(*row) for row in rows]
 
