@@ -1,5 +1,6 @@
 # CC-game-engine
-Playing around with some ideas for a CC type game engine
-So far just sorting out the data model and some bits of helper code
+Knocking about some ideas for a CC type game engine
+All game objects and state are stored in a sqlite3 database.
+
 
 
