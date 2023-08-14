@@ -48,6 +48,10 @@ def get_person_by_id(person_id):
     sql = f"SELECT * FROM persons WHERE person_id = '{person_id}'"
     return Person(*get_row(sql, []))
 
+def set_person_location(person_id, new_location):
+    sql = f"UPDATE persons SET location = '{new_location}' WHERE person_id = '{person_id}'"
+    return set_row(sql, [])
+
 # Locations
 
 def get_locations():
@@ -121,6 +125,7 @@ def get_containers():
     sql = f"SELECT * FROM containers"
     rows = get_list(sql, [])
     return [Container(*row) for row in rows]
+
 
 def get_containers_by_owner(owner_id):
     sql = f"SELECT * FROM containers WHERE owner_id = '{owner_id}'"

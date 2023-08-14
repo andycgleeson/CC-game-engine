@@ -1,29 +1,21 @@
 from gameobjects import Location, Person, Article, Portal, Container
 from help import *
 from db import *
-from utils import join_str_list
+from utils import join_str_list, get_person_info, get_room_info
 
 print("CC type game experiment")
 print("\n\n")
-
-
-def get_person_info(person_id):
-    person = get_person_by_id(person_id)
-    print(f"This persons name is '{person.name}'")
-    containers = get_containers_by_owner(person.person_id)
-    for container in containers:
-        print(f"They have a '{container.description}'")
-        articles = get_articles_by_owner(container.container_id)
-        for article in articles:
-            print(f"The {container.description} contains {article.description}")
 
 
 def current_room_info(person_id):
     person = get_person_by_id(person_id)
     current_room = get_location_by_id(person.location)
     exits = get_portals_for_location(current_room.location_id)
-    exit_str = [exit.direction for exit in exits]
-    print(f"You are in the {current_room.name} it has exits to the {join_str_list(exit_str)}")
+    if len(exits) > 0:
+        exit_str = f"There are exits to the {join_str_list([exit.direction for exit in exits])}."
+    else:
+        exit_str = 'There are no obvious exits'
+    print(f"You are in the {current_room.name}. {exit_str}")
 
 
 commands = ('QUIT', 'GO', 'PICKUP', 'DROP', 'LOOKAT', 'USE', 'HELP')
@@ -60,7 +52,23 @@ def QUIT(params):
 
 
 def GO(params):
-    print(f'{params}')
+    # Move to another location
+    person = get_person_by_id(get_default_user_id())
+    portals = get_portals_for_location(person.location)
+    selected_portal = None
+    for portal in portals:
+        if params[1] == portal.direction:
+            selected_portal = portal
+            break
+    if not selected_portal:
+        print('I cannot find an exit in that direction')
+    else:
+        if selected_portal.status == 'locked':
+            print(selected_portal.closed_description)
+        else:
+            set_person_location(person.person_id, portal.destination)
+            print(selected_portal.transit_description)
+    print('\n')
 
 
 def PICKUP(params):
@@ -72,12 +80,23 @@ def DROP(params):
 
 
 def LOOKAT(params):
-    print(f'{params}')
+    person = get_person_by_id(get_default_user_id())
+    current_room = get_location_by_id(person.location)
     for param in params[1:]:
         if param == 'ROOM':
-            print(param)
+            get_room_info(current_room.location_id)
+            break
         elif param == 'ME':
-            print(param)
+            get_person_info(person.person_id)
+            break
+        else:
+            pass
+            # anything else that could be looked at
+            # portals
+            # containers
+            # articles
+            # persons
+        print(f"I couldn't find anything called {param} to look at\n")
 
 
 def USE(params):
